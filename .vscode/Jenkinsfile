@@ -1,6 +1,5 @@
 pipeline {
     agent any
-
     environment {
         DOCKERHUB_USERNAME = "sayalipawar1264"
         APP_NAME = "docker_repo1"  
@@ -8,31 +7,38 @@ pipeline {
         IMAGE_NAME = "${DOCKERHUB_USERNAME}/${APP_NAME}"
         REGISTRY_CREDS = 'dockerhub'
     }
-
-
     stages {
-        stage('Checkout') {
-            steps {
-                git credentialsId: 'github', url: 'https://github.com/sayali1264/gitops-argocd-project2.git'
-            }
-        }
-
-        stage('Build Docker Image') {
+        stage('Cleanup workspace') {
             steps {
                 script {
-                    docker.build("sayalipawar1264/docker_repo1")
+                    cleanWs()
                 }
             }
         }
-
+        stage('Checkout SCM') {
+            steps {
+                git credentialsId: 'github',
+                    url: 'https://github.com/sayali1264/gitops-argocd-project2.git',
+                    branch: 'main'
+            }
+        }
+         stage('Build Docker Image') {
+            steps {
+                script {
+                    docker_image = docker.build("${IMAGE_NAME}")
+                }
+            }
+        }
         stage('Push Docker Image') {
             steps {
-                withDockerRegistry([credentialsId: 'dockerhub', url: '']) {
-                    script {
-                        docker.image("sayalipawar1264/docker_repo1").push()
+                script {
+                    docker.withRegistry('', REGISTRY_CREDS) {
+                        docker_image.push("$BUILD_NUMBER")
+                        docker_image.push('latest')
                     }
                 }
             }
         }
+
     }
 }

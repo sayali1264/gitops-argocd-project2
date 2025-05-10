@@ -1,13 +1,11 @@
-FROM nginx:alpine
-# Remove the default nginx index page
-RUN rm -rf /usr/share/nginx/html/*
+FROM python:3.9-slim-buster
 
-# Create a custom HTML file
-RUN echo "Hello World" > /usr/share/nginx/html/index.php
+RUN pip install flask
 
-# Expose port 80
-EXPOSE 80
+WORKDIR /app
 
-# Start nginx
-CMD ["nginx", "-g", "daemon off;"]
+COPY app.py .
 
+EXPOSE 5000
+
+ENTRYPOINT ["python", "app.py"]
