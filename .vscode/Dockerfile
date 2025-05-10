@@ -1,17 +1,20 @@
 # Use official Python base image
 FROM python:3.9-slim-buster
 
-# Install Flask
-RUN pip install flask
-
-# Set working directory in the container
+# Set the working directory in the container
 WORKDIR /app
 
-# Copy app.py to the container
+# Copy only requirements.txt first to leverage Docker caching
+COPY requirements.txt .
+
+# Install dependencies in a virtual environment
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy the rest of the application code
 COPY app.py .
 
-# Expose port 5000
+# Expose port 5000 for Flask
 EXPOSE 5000
 
 # Run the Flask app
-ENTRYPOINT ["python", "app.py"]
+CMD ["python", "app.py"]
