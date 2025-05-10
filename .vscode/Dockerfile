@@ -1,13 +1,13 @@
-FROM python:3.9-slim-buster
+FROM nginx:alpine
+# Remove the default nginx index page
+RUN rm -rf /usr/share/nginx/html/*
 
-WORKDIR /app
+# Create a custom HTML file
+RUN echo "Hello World" > /usr/share/nginx/html/index.php
 
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# Expose port 80
+EXPOSE 80
 
-COPY app.py .
-
-EXPOSE 5000
-
-CMD ["python", "app.py"]
+# Start nginx
+CMD ["nginx", "-g", "daemon off;"]
 
