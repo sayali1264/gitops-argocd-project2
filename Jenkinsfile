@@ -40,5 +40,19 @@ pipeline {
             }
         }
 
+
+    stage('Updating kubernetes deployment file') {
+            steps {
+                script {
+                    sh """
+                        cat flask-deployment.yaml
+                        sed -i 's/${APP_NAME}.*/${APP_NAME}:${IMAGE_TAG}/g' flask-deployment.yaml
+                        cat flask-deployment.yaml
+                    """
+                }
+            }
+        }
+
+
     }
 }
